@@ -7,16 +7,16 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import pickle
 
-# 1. தரவை ஏற்றுதல்
+# 1. Load the dataset
 df = pd.read_csv('diabetes.csv')
 
 X = df.drop(columns='Outcome')
 y = df['Outcome']
 
-# 2. Train Test Split
+# 2. Train-Test Split
 x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=42)
 
-# 3. Missing Value Imputation (Data Leakage இல்லாமல்)
+# 3. Missing Value Imputation (Without Data Leakage)
 columns_with_zeros = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']
 
 for col in columns_with_zeros:
@@ -25,7 +25,7 @@ for col in columns_with_zeros:
     median_value = x_train[col].median()
     x_train[col] = x_train[col].fillna(median_value)
 
-    # Test Data (Train median-ஐப் பயன்படுத்த வேண்டும்)
+    # Test Data (Must reuse the median value calculated from the Train data)
     x_test[col] = x_test[col].replace(0, np.nan)
     x_test[col] = x_test[col].fillna(median_value)
 
@@ -67,7 +67,7 @@ print(f"F1-Score:  {f1:.2%}\n")
 print("=== Confusion Matrix ===")
 print(confusion_matrix(y_test, y_pred_tuned))
 
-# 7. Model & Scaler சேமித்தல்
+# 7. Save Model & Scaler Package
 model_package = {
     "scaler": scaled,
     "model": best_dt_model
@@ -76,6 +76,5 @@ model_package = {
 with open('diabetes_model_package.pkl', "wb") as file_obj:
     pickle.dump(model_package, file_obj)
 print("\nModel and Scaler successfully saved!")
-
 
 print(x_train[col])
